@@ -40,12 +40,23 @@ export default function AdminProjects() {
       alert('Nenhum projeto local para sincronizar.')
       return
     }
-    const { error } = await client.from('call_projects').upsert(local, { onConflict: 'id' })
-    if (error) alert('Erro ao sincronizar: ' + error.message)
-    else {
-      alert('Projetos sincronizados com sucesso.')
-      setProjects(await loadProjects())
+    const { error, status } = await client.from('call_projects').upsert(local, { onConflict: 'id' })
+    if (error) {
+      alert('Erro ao sincronizar: ' + (error.message ?? JSON.stringify(error) ?? 'desconhecido') + ' | status: ' + status)
+      return
     }
+    alert('Projetos sincronizados com sucesso.')
+    setProjects(await loadProjects())
+  }
+
+  const diagnoseSupabase = async () => {
+    const client = sb()
+    if (!client) {
+      alert('Supabase não configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY e redeploy.')
+      return
+    }
+    const sel = await client.from('call_projects').select('*').limit(1)
+    alert('Diagnóstico select: status=' + sel.status + ' error=' + (sel.error?.message ?? JSON.stringify(sel.error) ?? 'none'))
   }
 
   const importJson = (file: File) => {
@@ -89,6 +100,7 @@ export default function AdminProjects() {
               <input type="file" accept="application/json" className="hidden" onChange={e=>{const f=e.target.files?.[0]; if(f) importJson(f)}} />
             </label>
             <button onClick={syncToSupabase} className="px-3 py-2 rounded bg-[#fc0f57] hover:bg-[#e30e51]">Sincronizar com Supabase</button>
+            <button onClick={diagnoseSupabase} className="px-3 py-2 rounded border border-neutral-700">Diagnosticar Supabase</button>
           </div>
         </div>
         <table className="w-full text-sm">

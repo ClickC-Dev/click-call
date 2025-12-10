@@ -42,6 +42,7 @@ export default function PublicCall() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const timerRef = useRef<number | null>(null)
   const ringVibeRef = useRef<number | null>(null)
+  const [avatarSrc, setAvatarSrc] = useState<string>(DEFAULT_AVATAR_URL)
   const [ready, setReady] = useState(false)
   const [progress, setProgress] = useState(0)
 
@@ -64,6 +65,10 @@ export default function PublicCall() {
       </h1>
     )
   }
+
+  useEffect(() => {
+    setAvatarSrc(avatar)
+  }, [avatar])
 
   useEffect(() => {
     return () => {
@@ -210,7 +215,7 @@ export default function PublicCall() {
               {!minimalIntro && (
                 <div className="relative">
                   <div className="soft-glow"></div>
-                  <img src={avatar} alt="avatar" className={`w-28 h-28 rounded-full ring-4 ${state==='ringing'?'ring-[#2fff6d]/40':'ring-transparent'} shadow-[0_0_30px_rgba(47,255,109,0.4)]`} />
+                  <img src={avatarSrc} alt="avatar" onError={()=>setAvatarSrc(DEFAULT_AVATAR_URL)} className={`w-28 h-28 rounded-full ring-4 ${state==='ringing'?'ring-[#2fff6d]/40':'ring-transparent'} shadow-[0_0_30px_rgba(47,255,109,0.4)]`} />
                 </div>
               )}
               {state === 'intro' && (
@@ -249,7 +254,7 @@ export default function PublicCall() {
                   <div className="w-full flex-1 flex flex-col items-center justify-center gap-6">
                     <div className="relative -mt-12">
                       <div className="soft-glow"></div>
-                      <img src={avatar} alt="avatar" className="w-28 h-28 rounded-full ring-4 ring-[#2fff6d]/40 shadow-[0_0_30px_rgba(47,255,109,0.4)]" />
+                      <img src={avatarSrc} alt="avatar" onError={()=>setAvatarSrc(DEFAULT_AVATAR_URL)} className="w-28 h-28 rounded-full ring-4 ring-[#2fff6d]/40 shadow-[0_0_30px_rgba(47,255,109,0.4)]" />
                     </div>
                     <div className="text-white font-semibold">{nameDisplay}</div>
                     <div className="w-full flex items-center justify-center gap-8">
@@ -281,7 +286,7 @@ export default function PublicCall() {
                   <div className="w-full flex-1 flex flex-col items-center justify-center gap-6">
                     <div className="relative pulse-slow">
                       <div className="soft-glow"></div>
-                      <img src={avatar} alt="avatar" className="w-28 h-28 rounded-full ring-4 ring-[#2fff6d]/40 shadow-[0_0_30px_rgba(47,255,109,0.4)]" />
+                      <img src={avatarSrc} alt="avatar" onError={()=>setAvatarSrc(DEFAULT_AVATAR_URL)} className="w-28 h-28 rounded-full ring-4 ring-[#2fff6d]/40 shadow-[0_0_30px_rgba(47,255,109,0.4)]" />
                     </div>
                     <div className="text-white font-semibold text-xl">{nameDisplay}</div>
                     <div className="text-center text-sm text-gray-300">{Math.floor(elapsed/60).toString().padStart(2,'0')}:{(elapsed%60).toString().padStart(2,'0')}</div>
@@ -312,7 +317,7 @@ export default function PublicCall() {
                 <div className="w-full flex-1 flex flex-col items-center justify-center gap-5">
                   <div className="relative">
                     <div className="soft-glow"></div>
-                    <img src={avatar} alt="avatar" className="w-24 h-24 rounded-full ring-4 ring-[#2fff6d]/20 shadow-[0_0_30px_rgba(47,255,109,0.25)]" />
+                    <img src={avatarSrc} alt="avatar" onError={()=>setAvatarSrc(DEFAULT_AVATAR_URL)} className="w-24 h-24 rounded-full ring-4 ring-[#2fff6d]/20 shadow-[0_0_30px_rgba(47,255,109,0.25)]" />
                   </div>
                   <div className="text-white font-semibold text-lg">{nameDisplay}</div>
                   <div className="text-sm text-gray-400">Ligação encerrada</div>
