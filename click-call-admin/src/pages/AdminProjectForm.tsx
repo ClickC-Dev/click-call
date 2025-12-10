@@ -24,16 +24,16 @@ export default function AdminProjectForm({ mode }: { mode: 'new' | 'edit' }) {
     if (mode === 'new') {
       setP({
         id: uid(),
-        name: 'Novo Projeto',
-        slug: 'novo-projeto',
-        domain_user: 'usuario',
-        domain_call: 'projeto',
-        caller_name: 'Santa',
-        avatar_url: DEFAULT_AVATAR_URL,
+        name: 'Natal',
+        slug: 'noel',
+        domain_user: 'clickc',
+        domain_call: 'noel',
+        caller_name: 'Papai Noel',
+        avatar_url: 'https://gorjpnrijxdiuuwmyfak.supabase.co/storage/v1/object/public/Call/Presente%20-%20Cliente.webp',
         bg: DEFAULT_BG,
         audio_url: DEFAULT_NOEL_AUDIO_URL,
         initial_message: DEFAULT_INITIAL_MESSAGE,
-        intro_cta_text: DEFAULT_INTRO_CTA_TEXT,
+        intro_cta_text: 'Estou pronto',
         cta_text: '',
         cta_url: ''
       })
