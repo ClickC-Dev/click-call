@@ -6,6 +6,7 @@ import { DEFAULT_AVATAR_URL, DEFAULT_BG, DEFAULT_INTRO_CTA_TEXT, DEFAULT_RINGTON
 import '../call.css'
 import { Phone, Volume2, VolumeX, Mic, MicOff, Video, VideoOff, Check, XIcon, Clock, ThumbUp, ThumbDown } from '../components/icons'
 import { canonicalLink } from '../lib/link'
+import { sb } from '../lib/supabase'
 import { isLoggedIn } from '../lib/auth'
 
 type ViewState = 'intro' | 'ringing' | 'connected' | 'ended'
@@ -141,6 +142,18 @@ export default function PublicCall() {
       arr.push({ projectId: project?.id, user: u, call: c, elapsed, quality, at: Date.now() })
       localStorage.setItem(key, JSON.stringify(arr))
     } catch {}
+    ;(async () => {
+      const client = sb()
+      if (client && project) {
+        await client.from('call_feedbacks').insert({
+          project_id: project.id,
+          domain_user: project.domain_user,
+          domain_call: project.domain_call,
+          elapsed_seconds: elapsed,
+          quality
+        })
+      }
+    })()
     window.setTimeout(() => {
       setFeedback(null)
       setElapsed(0)
