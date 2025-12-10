@@ -40,13 +40,8 @@ export default function AdminProjects() {
       alert('Nenhum projeto local para sincronizar.')
       return
     }
-    const isUuid = (s?: string) => !!s && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s)
-    const good = local.filter(p => isUuid(p.id))
-    const bad = local.filter(p => !isUuid(p.id)).map(({ id, ...rest }) => rest)
-    const ins = bad.length ? await client.from('call_projects').insert(bad) : { error: null, status: 200 }
-    const ups = good.length ? await client.from('call_projects').upsert(good, { onConflict: 'id' }) : { error: null, status: 200 }
-    const error = ins.error || ups.error
-    const status = ins.status || ups.status
+    const payload = local.map(({ id, ...rest }) => rest)
+    const { error, status } = await client.from('call_projects').upsert(payload, { onConflict: 'domain_user,domain_call' })
     if (error) {
       alert('Erro ao sincronizar: ' + (error.message ?? JSON.stringify(error) ?? 'desconhecido') + ' | status: ' + status)
       return

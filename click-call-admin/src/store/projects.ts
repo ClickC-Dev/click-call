@@ -51,12 +51,8 @@ export const getProjectBySegments = async (user?: string | null, call?: string |
 export const upsertProject = async (project: Project) => {
   const client = sb()
   if (client) {
-    if (!isUuid(project.id)) {
-      const { id, ...rest } = project as any
-      await client.from('call_projects').insert(rest)
-      return
-    }
-    await client.from('call_projects').upsert(project, { onConflict: 'id' })
+    const { id, ...rest } = project as any
+    await client.from('call_projects').upsert(rest, { onConflict: 'domain_user,domain_call' })
     return
   }
   const arr = await loadProjects()
