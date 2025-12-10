@@ -1,8 +1,14 @@
 import type { Project } from '../types'
+import { sb } from '../lib/supabase'
 
 const KEY = 'cc_projects'
 
-export const loadProjects = (): Project[] => {
+export const loadProjects = async (): Promise<Project[]> => {
+  const client = sb()
+  if (client) {
+    const { data, error } = await client.from('call_projects').select('*').order('created_at', { ascending: false })
+    if (!error && Array.isArray(data)) return data as unknown as Project[]
+  }
   try {
     const raw = localStorage.getItem(KEY)
     if (!raw) return []
@@ -18,23 +24,47 @@ export const saveProjects = (projects: Project[]) => {
   localStorage.setItem(KEY, JSON.stringify(projects))
 }
 
-export const getProjectById = (id: string) => loadProjects().find(p => p.id === id)
-
-export const getProjectBySegments = (user?: string | null, call?: string | null) => {
-  const u = user || ''
-  const c = call || ''
-  return loadProjects().find(p => p.domain_user === u && p.domain_call === c)
+export const getProjectById = async (id: string) => {
+  const client = sb()
+  if (client) {
+    const { data } = await client.from('call_projects').select('*').eq('id', id).single()
+    if (data) return data as unknown as Project
+  }
+  const arr = await loadProjects()
+  return arr.find(p => p.id === id)
 }
 
-export const upsertProject = (project: Project) => {
-  const arr = loadProjects()
+export const getProjectBySegments = async (user?: string | null, call?: string | null) => {
+  const u = user || ''
+  const c = call || ''
+  const client = sb()
+  if (client) {
+    const { data } = await client.from('call_projects').select('*').eq('domain_user', u).eq('domain_call', c).single()
+    if (data) return data as unknown as Project
+  }
+  const arr = await loadProjects()
+  return arr.find(p => p.domain_user === u && p.domain_call === c) || null
+}
+
+export const upsertProject = async (project: Project) => {
+  const client = sb()
+  if (client) {
+    await client.from('call_projects').upsert(project, { onConflict: 'id' })
+    return
+  }
+  const arr = await loadProjects()
   const idx = arr.findIndex(p => p.id === project.id)
   if (idx >= 0) arr[idx] = project
   else arr.push(project)
   saveProjects(arr)
 }
 
-export const deleteProject = (id: string) => {
-  const arr = loadProjects().filter(p => p.id !== id)
+export const deleteProject = async (id: string) => {
+  const client = sb()
+  if (client) {
+    await client.from('call_projects').delete().eq('id', id)
+    return
+  }
+  const arr = (await loadProjects()).filter(p => p.id !== id)
   saveProjects(arr)
 }

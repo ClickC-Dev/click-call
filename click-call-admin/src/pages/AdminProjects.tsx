@@ -9,12 +9,12 @@ export default function AdminProjects() {
   const nav = useNavigate()
 
   useEffect(() => {
-    setProjects(loadProjects())
+    (async () => setProjects(await loadProjects()))()
   }, [])
 
-  const onRemove = (id: string) => {
-    deleteProject(id)
-    setProjects(loadProjects())
+  const onRemove = async (id: string) => {
+    await deleteProject(id)
+    setProjects(await loadProjects())
   }
 
   const exportJson = () => {

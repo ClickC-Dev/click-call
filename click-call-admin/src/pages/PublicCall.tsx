@@ -5,6 +5,7 @@ import type { Project } from '../types'
 import { DEFAULT_AVATAR_URL, DEFAULT_BG, DEFAULT_INTRO_CTA_TEXT, DEFAULT_RINGTONE_URL, DEFAULT_NOEL_AUDIO_URL } from '../constants'
 import '../call.css'
 import { Phone, Volume2, VolumeX, Mic, MicOff, Video, VideoOff, Check, XIcon, Clock, ThumbUp, ThumbDown } from '../components/icons'
+import { canonicalLink } from '../lib/link'
 import { isLoggedIn } from '../lib/auth'
 
 type ViewState = 'intro' | 'ringing' | 'connected' | 'ended'
@@ -14,8 +15,10 @@ export default function PublicCall() {
   const [sp] = useSearchParams()
   const u = user || sp.get('user') || ''
   const c = call || sp.get('call') || ''
-  const found = getProjectBySegments(u, c)
-  const project: Project | null = found || null
+  const [project, setProject] = useState<Project | null>(null)
+  useEffect(() => {
+    (async () => setProject(await getProjectBySegments(u, c)))()
+  }, [u, c])
   const minimalIntro = u.toLowerCase() === 'clickc' && c.toLowerCase() === 'noel'
 
   const [state, setState] = useState<ViewState>('intro')
@@ -120,7 +123,8 @@ export default function PublicCall() {
   }, [muted])
 
   const shareLink = () => {
-    const url = `https://call.clickc.com.br/${encodeURIComponent(u)}/${encodeURIComponent(c)}`
+    const p: Project | null = project
+    const url = p ? canonicalLink(p) : new URL(`/${encodeURIComponent(u)}/${encodeURIComponent(c)}`, window.location.origin).toString()
     const callerName = project?.caller_name || 'Click Call'
     const payload = { title: 'Click Call', text: `Clique para atender sua call personalizada: ${callerName}`, url }
     if (navigator.share) navigator.share(payload).catch(()=>{})
@@ -287,7 +291,7 @@ export default function PublicCall() {
                 <div className="w-full mt-6">
                   <div className="rounded-xl border border-gray-800 p-4 shadow-sm">
                     <div className="font-semibold mb-2">Informações de domínio</div>
-                    <div className="text-sm text-gray-300 break-all">https://call.clickc.com.br/{u}/{c}</div>
+                    <div className="text-sm text-gray-300 break-all">{new URL(`/${u}/${c}`, window.location.origin).toString()}</div>
                     <div className="text-sm text-gray-500 mt-1">Link de compartilhamento</div>
                   </div>
                 </div>

@@ -13,8 +13,10 @@ export default function AdminProjectForm({ mode }: { mode: 'new' | 'edit' }) {
 
   useEffect(() => {
     if (mode === 'edit' && id) {
-      const found = getProjectById(id)
-      if (found) setP(found)
+      (async () => {
+        const found = await getProjectById(id)
+        if (found) setP(found)
+      })()
     }
   }, [mode, id])
 
@@ -42,9 +44,9 @@ export default function AdminProjectForm({ mode }: { mode: 'new' | 'edit' }) {
 
   const link = useMemo(() => p ? fallbackLink(p) : '', [p])
 
-  const save = () => {
+  const save = async () => {
     if (!p) return
-    upsertProject(p)
+    await upsertProject(p)
     nav('/admin/projects')
   }
 
