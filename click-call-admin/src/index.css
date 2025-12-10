@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-dark: radial-gradient(circle at 20% 20%, #0b0b0b 0%, #141414 40%, #1a1a1a 100%);
+}
+
+html, body, #root { height: 100%; }
+
