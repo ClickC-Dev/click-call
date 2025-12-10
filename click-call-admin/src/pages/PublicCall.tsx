@@ -20,7 +20,7 @@ export default function PublicCall() {
   useEffect(() => {
     (async () => setProject(await getProjectBySegments(u, c)))()
   }, [u, c])
-  const minimalIntro = u.toLowerCase() === 'clickc' && c.toLowerCase() === 'noel'
+  const minimalIntro = u.toLowerCase() === 'clickc'
 
   const [state, setState] = useState<ViewState>('intro')
   const [muted, setMuted] = useState(false)
