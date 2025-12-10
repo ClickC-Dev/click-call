@@ -8,7 +8,11 @@ export const hasAdminCreds = () => !!ADMIN_EMAIL && !!ADMIN_PASSWORD
 
 export const login = (email: string, password: string) => {
   if (!ADMIN_EMAIL || !ADMIN_PASSWORD) return false
-  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+  const e = String(email).trim().toLowerCase()
+  const ep = String(ADMIN_EMAIL).trim().toLowerCase()
+  const p = String(password)
+  const pp = String(ADMIN_PASSWORD)
+  if (e === ep && p === pp) {
     localStorage.setItem('cc_admin_auth', '1')
     return true
   }

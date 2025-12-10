@@ -68,3 +68,14 @@ export const deleteProject = async (id: string) => {
   const arr = (await loadProjects()).filter(p => p.id !== id)
   saveProjects(arr)
 }
+export const loadLocalProjects = (): Project[] => {
+  try {
+    const raw = localStorage.getItem(KEY)
+    if (!raw) return []
+    const arr = JSON.parse(raw)
+    if (Array.isArray(arr)) return arr
+    return []
+  } catch {
+    return []
+  }
+}

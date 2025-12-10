@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { deleteProject, loadProjects } from '../store/projects'
+import { deleteProject, loadProjects, loadLocalProjects } from '../store/projects'
+import { sb } from '../lib/supabase'
 import type { Project } from '../types'
 import { fallbackLink } from '../lib/link'
 
@@ -25,6 +26,25 @@ export default function AdminProjects() {
     a.download = 'click-call-projects.json'
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  const syncToSupabase = async () => {
+    const client = sb()
+    if (!client) {
+      alert('Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no ambiente de produção.')
+      return
+    }
+    const local = loadLocalProjects()
+    if (!local.length) {
+      alert('Nenhum projeto local para sincronizar.')
+      return
+    }
+    const { error } = await client.from('call_projects').upsert(local, { onConflict: 'id' })
+    if (error) alert('Erro ao sincronizar: ' + error.message)
+    else {
+      alert('Projetos sincronizados com sucesso.')
+      setProjects(await loadProjects())
+    }
   }
 
   const importJson = (file: File) => {
@@ -67,6 +87,7 @@ export default function AdminProjects() {
               Importar
               <input type="file" accept="application/json" className="hidden" onChange={e=>{const f=e.target.files?.[0]; if(f) importJson(f)}} />
             </label>
+            <button onClick={syncToSupabase} className="px-3 py-2 rounded bg-[#fc0f57] hover:bg-[#e30e51]">Sincronizar com Supabase</button>
           </div>
         </div>
         <table className="w-full text-sm">
