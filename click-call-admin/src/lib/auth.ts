@@ -4,6 +4,7 @@ const ADMIN_EMAIL = getEnv('ADMIN_EMAIL') || ''
 const ADMIN_PASSWORD = getEnv('ADMIN_PASSWORD') || ''
 
 export const isLoggedIn = () => localStorage.getItem('cc_admin_auth') === '1'
+export const hasAdminCreds = () => !!ADMIN_EMAIL && !!ADMIN_PASSWORD
 
 export const login = (email: string, password: string) => {
   if (!ADMIN_EMAIL || !ADMIN_PASSWORD) return false
@@ -17,4 +18,3 @@ export const login = (email: string, password: string) => {
 export const logout = () => {
   localStorage.removeItem('cc_admin_auth')
 }
-

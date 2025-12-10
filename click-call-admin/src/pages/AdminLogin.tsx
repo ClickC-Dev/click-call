@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react'
-import { login } from '@/lib/auth'
+import { login, hasAdminCreds } from '@/lib/auth'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 export default function AdminLogin() {
@@ -30,6 +30,7 @@ export default function AdminLogin() {
             <label className="text-sm">Senha</label>
             <input value={password} onChange={e=>setPassword(e.target.value)} type="password" className="mt-1 w-full px-3 py-2 rounded bg-neutral-800 border border-neutral-700 focus:outline-none" required />
           </div>
+          {!hasAdminCreds() && <div className="text-yellow-400 text-sm">Configuração de credenciais ausente. Defina VITE_ADMIN_EMAIL e VITE_ADMIN_PASSWORD.</div>}
           {error && <div className="text-red-400 text-sm">{error}</div>}
           <button className="w-full py-2 rounded bg-emerald-600 hover:bg-emerald-500">Entrar</button>
         </form>
@@ -37,4 +38,3 @@ export default function AdminLogin() {
     </div>
   )
 }
-
