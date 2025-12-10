@@ -1,6 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import './index.css'
 import AdminLogin from './pages/AdminLogin'
 import AdminProjects from './pages/AdminProjects'
@@ -15,7 +15,8 @@ const router = createBrowserRouter([
   { path: '/admin/projects/:id/edit', element: <RequireAdmin><AdminProjectForm mode="edit" /></RequireAdmin> },
   { path: '/:user/:call', element: <PublicCall /> },
   { path: '/call', element: <PublicCall /> },
-  { path: '/', element: <RequireAdmin><AdminProjects /></RequireAdmin> }
+  { path: '/', element: <Navigate to="/admin/login" replace /> },
+  { path: '*', element: <Navigate to="/admin/login" replace /> }
 ])
 
 createRoot(document.getElementById('root')!).render(
