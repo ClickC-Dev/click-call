@@ -23,7 +23,7 @@ export default function AdminProjectForm({ mode }: { mode: 'new' | 'edit' }) {
   useEffect(() => {
     if (mode === 'new') {
       setP({
-        id: uid(),
+        id: (typeof crypto !== 'undefined' && 'randomUUID' in crypto) ? crypto.randomUUID() : uid(),
         name: 'Natal',
         slug: 'noel',
         domain_user: 'clickc',

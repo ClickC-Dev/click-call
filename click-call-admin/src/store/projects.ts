@@ -1,6 +1,8 @@
 import type { Project } from '../types'
 import { sb } from '../lib/supabase'
 
+const isUuid = (s?: string) => !!s && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s)
+
 const KEY = 'cc_projects'
 
 export const loadProjects = async (): Promise<Project[]> => {
@@ -49,6 +51,11 @@ export const getProjectBySegments = async (user?: string | null, call?: string |
 export const upsertProject = async (project: Project) => {
   const client = sb()
   if (client) {
+    if (!isUuid(project.id)) {
+      const { id, ...rest } = project as any
+      await client.from('call_projects').insert(rest)
+      return
+    }
     await client.from('call_projects').upsert(project, { onConflict: 'id' })
     return
   }
