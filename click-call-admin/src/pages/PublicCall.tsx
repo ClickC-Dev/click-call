@@ -221,7 +221,7 @@ export default function PublicCall() {
                       <div className="soft-glow"></div>
                       <img src={avatar} alt="avatar" className="w-28 h-28 rounded-full ring-4 ring-[#2fff6d]/40 shadow-[0_0_30px_rgba(47,255,109,0.4)]" />
                     </div>
-                    <div className="text-white font-semibold">{project.caller_name}</div>
+                    <div className="text-white font-semibold">{nameDisplay}</div>
                     <div className="w-full flex items-center justify-center gap-8">
                       <button onClick={rejectCall} className="rounded-full w-20 h-20 bg-red-600 hover:bg-red-700 text-white flex items-center justify-center"><XIcon /></button>
                       <button onClick={shareLink} className="rounded-full w-16 h-16 border border-gray-700 text-gray-300 hover:text-white flex items-center justify-center"><Clock /></button>
@@ -266,8 +266,8 @@ export default function PublicCall() {
                   <div className="w-full space-y-5">
                     <div className="text-center text-sm text-gray-300">Conectado • {Math.floor(elapsed/60).toString().padStart(2,'0')}:{(elapsed%60).toString().padStart(2,'0')}</div>
                     <div className="text-center text-lg font-medium">{connectedMessage}</div>
-                    {project.cta_text && project.cta_url && (
-                      <a href={project.cta_url} target="_blank" className="block w-full text-center py-3 rounded bg-[#fc0f57] hover:bg-[#e30e51] text-white">{project.cta_text}</a>
+                    {project?.cta_text && project?.cta_url && (
+                      <a href={project!.cta_url} target="_blank" className="block w-full text-center py-3 rounded bg-[#fc0f57] hover:bg-[#e30e51] text-white">{project!.cta_text}</a>
                     )}
                     <div className="grid grid-cols-4 gap-3">
                       <button onClick={()=>setMuted(m=>!m)} className="rounded-full w-12 h-12 bg-white/10 text-white hover:bg-white/20 border border-white/10 flex items-center justify-center backdrop-blur-md">{muted ? <VolumeX /> : <Volume2 />}</button>
