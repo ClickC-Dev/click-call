@@ -30,7 +30,7 @@ export default function PublicCall() {
     })()
     return () => { window.clearInterval(inc) }
   }, [u, c])
-  const minimalIntro = u.toLowerCase() === 'clickc'
+  const minimalIntro = true
 
   const [state, setState] = useState<ViewState>('intro')
   const [muted, setMuted] = useState(false)

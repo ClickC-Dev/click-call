@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { deleteProject, loadProjects, loadLocalProjects } from '../store/projects'
+import { canonicalLink } from '../lib/link'
 import { sb } from '../lib/supabase'
 import type { Project } from '../types'
 import { fallbackLink } from '../lib/link'
@@ -65,12 +66,12 @@ export default function AdminProjects() {
     <tr key={p.id} className="border-b border-neutral-800">
       <td className="py-2">{p.name}</td>
       <td className="py-2">@{p.caller_name}</td>
-      <td className="py-2 text-xs text-neutral-400 break-all">{fallbackLink(p)}</td>
+      <td className="py-2 text-xs text-neutral-400 break-all">{canonicalLink(p)}</td>
       <td className="py-2 flex gap-2">
         <button onClick={()=>nav(`/admin/projects/${p.id}/edit`)} className="px-2 py-1 rounded bg-neutral-700">Editar</button>
         <button onClick={()=>onRemove(p.id)} className="px-2 py-1 rounded bg-red-600">Remover</button>
         <a href={`/${encodeURIComponent(p.domain_user)}/${encodeURIComponent(p.domain_call)}`} target="_blank" className="px-2 py-1 rounded bg-emerald-600">Preview</a>
-        <button onClick={()=>navigator.clipboard.writeText(fallbackLink(p))} className="px-2 py-1 rounded bg-neutral-700">Copiar link</button>
+        <button onClick={()=>navigator.clipboard.writeText(canonicalLink(p))} className="px-2 py-1 rounded bg-neutral-700">Copiar link</button>
       </td>
     </tr>
   )), [projects])

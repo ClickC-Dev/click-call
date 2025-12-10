@@ -4,7 +4,7 @@ import type { Project } from '../types'
 import { getProjectById, upsertProject } from '../store/projects'
 import { uid } from '../lib/id'
 import { DEFAULT_AVATAR_URL, DEFAULT_BG, DEFAULT_INITIAL_MESSAGE, DEFAULT_INTRO_CTA_TEXT, DEFAULT_NOEL_AUDIO_URL, DEFAULT_RINGTONE_URL } from '../constants'
-import { fallbackLink } from '../lib/link'
+import { canonicalLink } from '../lib/link'
 
 export default function AdminProjectForm({ mode }: { mode: 'new' | 'edit' }) {
   const { id } = useParams()
@@ -42,7 +42,7 @@ export default function AdminProjectForm({ mode }: { mode: 'new' | 'edit' }) {
 
   const set = (k: keyof Project, v: any) => setP(prev => prev ? { ...prev, [k]: v } : prev)
 
-  const link = useMemo(() => p ? fallbackLink(p) : '', [p])
+  const link = useMemo(() => p ? canonicalLink(p) : '', [p])
 
   const save = async () => {
     if (!p) return
