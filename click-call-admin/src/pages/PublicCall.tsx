@@ -18,7 +18,17 @@ export default function PublicCall() {
   const c = call || sp.get('call') || ''
   const [project, setProject] = useState<Project | null>(null)
   useEffect(() => {
-    (async () => setProject(await getProjectBySegments(u, c)))()
+    setReady(false)
+    setProgress(0)
+    const inc = window.setInterval(() => setProgress(p => Math.min(p + 7, 85)), 250)
+    ;(async () => {
+      const p = await getProjectBySegments(u, c)
+      setProject(p)
+      setProgress(100)
+      setReady(true)
+      window.clearInterval(inc)
+    })()
+    return () => { window.clearInterval(inc) }
   }, [u, c])
   const minimalIntro = u.toLowerCase() === 'clickc'
 
@@ -31,6 +41,9 @@ export default function PublicCall() {
   const ringtoneRef = useRef<HTMLAudioElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const timerRef = useRef<number | null>(null)
+  const ringVibeRef = useRef<number | null>(null)
+  const [ready, setReady] = useState(false)
+  const [progress, setProgress] = useState(0)
 
   const bg = useMemo(() => project?.bg || DEFAULT_BG, [project])
   const avatar = useMemo(() => project?.avatar_url || DEFAULT_AVATAR_URL, [project])
@@ -59,6 +72,7 @@ export default function PublicCall() {
   }, [])
 
   const startRinging = () => {
+    if (!ready) return
     setState('ringing')
     try { navigator.vibrate?.([200, 150, 200, 300]) } catch {}
     const ring = new Audio(DEFAULT_RINGTONE_URL)
@@ -66,12 +80,18 @@ export default function PublicCall() {
     ring.volume = 0.7
     ringtoneRef.current = ring
     ring.play().catch(()=>{})
+    if (!ringVibeRef.current) {
+      ringVibeRef.current = window.setInterval(() => {
+        try { navigator.vibrate?.([120, 90, 120]) } catch {}
+      }, 1400)
+    }
     if (!minimalIntro) window.setTimeout(() => connect(), 2500)
   }
 
   const connect = () => {
     ringtoneRef.current?.pause()
     ringtoneRef.current = null
+    if (ringVibeRef.current) { window.clearInterval(ringVibeRef.current); ringVibeRef.current = null }
     setState('connected')
     setElapsed(0)
     timerRef.current = window.setInterval(() => setElapsed(e => e + 1), 1000)
@@ -105,6 +125,7 @@ export default function PublicCall() {
   const endCall = () => {
     ringtoneRef.current?.pause()
     audioRef.current?.pause()
+    if (ringVibeRef.current) { window.clearInterval(ringVibeRef.current); ringVibeRef.current = null }
     setState('ended')
     if (timerRef.current) window.clearInterval(timerRef.current)
     timerRef.current = null
@@ -115,6 +136,7 @@ export default function PublicCall() {
     audioRef.current?.pause()
     if (timerRef.current) window.clearInterval(timerRef.current)
     timerRef.current = null
+    if (ringVibeRef.current) { window.clearInterval(ringVibeRef.current); ringVibeRef.current = null }
     setElapsed(0)
     setState('intro')
   }
@@ -200,7 +222,11 @@ export default function PublicCall() {
                         <Volume2 />
                         <span>Verifique se o som está ativado.</span>
                       </div>
-                      <button onClick={startRinging} className="mt-2 w-72 max-w-full py-3 rounded bg-[#fc0f57] hover:bg-[#e30e51] text-white">{introText}</button>
+                      {!ready && <div className="text-sm text-gray-400">Preparando...</div>}
+                      <button onClick={startRinging} disabled={!ready} className={`mt-2 w-72 max-w-full py-3 rounded ${ready?'bg-[#fc0f57] hover:bg-[#e30e51]':'bg-[#fc0f57]/50'} text-white relative overflow-hidden`}>
+                        <span className="relative z-10">{ready ? introText : 'Preparando...'}</span>
+                        <span className="absolute left-0 top-0 h-full bg-white/20" style={{ width: `${progress}%` }}></span>
+                      </button>
                     </div>
                   </div>
                 ) : (
@@ -210,7 +236,11 @@ export default function PublicCall() {
                       <Volume2 />
                       <span>Dica: ative o som para melhor experiência</span>
                     </div>
-                    <button onClick={startRinging} className="mt-2 w-full py-3 rounded bg-[#fc0f57] hover:bg-[#e30e51] text-white">{introText}</button>
+                    {!ready && <div className="text-sm text-gray-400">Preparando...</div>}
+                    <button onClick={startRinging} disabled={!ready} className={`mt-2 w-full py-3 rounded ${ready?'bg-[#fc0f57] hover:bg-[#e30e51]':'bg-[#fc0f57]/50'} text-white relative overflow-hidden`}>
+                      <span className="relative z-10">{ready ? introText : 'Preparando...'}</span>
+                      <span className="absolute left-0 top-0 h-full bg-white/20" style={{ width: `${progress}%` }}></span>
+                    </button>
                   </div>
                 )
               )}
